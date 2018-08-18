@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Quiet Communication</string>
+    <string name="translate">Enter text to translate</string>
 </resources>

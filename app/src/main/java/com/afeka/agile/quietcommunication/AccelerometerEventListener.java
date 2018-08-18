@@ -10,15 +10,25 @@ public class AccelerometerEventListener implements SensorEventListener{
     private final float SHAKE_THRESHOLD = 200;
     private final int SLEEP_CHAR=2500; //time for wait until start record new char
     private final int SPEED_LEVEL =1200; //maxSpeed< is . else -
+    private boolean record;
+
 
     private int shakeCounter;
     private long lastUpdate,lastTime;
     private float last_x,last_y,last_z;
     private boolean shake=false;
     private float  maxSpeed;
-    private StringBuilder charBuilder=new StringBuilder();
-    public static StringBuilder wordBuilder=new StringBuilder();
-    private VibrateDriver vibrateDriver=new VibrateDriver();
+    private StringBuilder charBuilder;
+    private StringBuilder wordBuilder;
+    private VibrateDriver vibrateDriver;
+   
+   
+    public AccelerometerEventListener(){
+        charBuilder=new StringBuilder();
+        wordBuilder=new StringBuilder();
+        vibrateDriver=new VibrateDriver();
+    }
+   
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
@@ -34,7 +44,7 @@ public class AccelerometerEventListener implements SensorEventListener{
 
         long curTime = System.currentTimeMillis();
 
-        if ((curTime - lastTime) > 80 && MainActivity.record) {
+        if ((curTime - lastTime) > 80 && record) {
             long diffTime = (curTime - lastTime);
             float speed = Math.abs(x + y + z - last_x - last_y - last_z) / diffTime * 10000;
             if (speed > SHAKE_THRESHOLD) {
@@ -64,34 +74,25 @@ public class AccelerometerEventListener implements SensorEventListener{
 
     private void shakeIt(long curTime) {
         avrageSpeed=avrageSpeed/shakeCounter;
-
+        char charAppend;
+        double vibrate;
         Log.v("getAccelerometer", "shakeCounter is:" + shakeCounter + " and maxSpeed is:"
                 + maxSpeed +" avarageSpeed="+avrageSpeed+ "\n##############################################################");
-        if (curTime-lastUpdate<SLEEP_CHAR && maxSpeed> SPEED_LEVEL){
-            Log.d("translate","line");
-            charBuilder.append('-');
-            vibrateDriver.vibrate('1');
-        }else if(curTime-lastUpdate<SLEEP_CHAR && maxSpeed< SPEED_LEVEL) {
-            Log.d("translate","dout");
-            charBuilder.append('.');
-            vibrateDriver.vibrate('2');
-
-        }else if(maxSpeed< SPEED_LEVEL){
-            newChar('.');
-            vibrateDriver.vibrate('2');
-            Log.d("translate","new Char, dout");
+        if (curTime-lastUpdate<SLEEP_CHAR){
+            if (maxSpeed> SPEED_LEVEL){
+                charAppend='-';vibrate=VibrateDriver.LONG_VIB_LENTH;
+            }else{
+                charAppend='.';vibrate=VibrateDriver.SHORT_VIB_LENTH;
+            }
+        }else if(maxSpeed > SPEED_LEVEL){
+            flushChar();
+            charAppend='-';vibrate=VibrateDriver.LONG_VIB_LENTH;
         }else{
-            newChar('-');
-            Log.d("translate","new Char, line");
-            vibrateDriver.vibrate('1');
+            flushChar();
+            charAppend='.';vibrate=VibrateDriver.SHORT_VIB_LENTH;
         }
-    }
-
-    private void newChar(char i) {
-        Character ch=MorseDic.morseToLetters.get(charBuilder.toString());
-        if (ch!=null)
-            wordBuilder.append(ch);
-        charBuilder=new StringBuilder(""+i);
+        vibrateDriver.vibrate(vibrate);
+        charBuilder.append(charAppend);
     }
 
     @Override
@@ -99,4 +100,29 @@ public class AccelerometerEventListener implements SensorEventListener{
 
     }
 
+    public boolean isRecord() {
+        return record;
+    }
+
+    public void setRecord(boolean record) {
+        this.record = record;
+    }
+
+    public StringBuilder getWordBuilder() {
+        return wordBuilder;
+    }
+
+    public void setWordBuilder(StringBuilder wordBuilder) {
+        this.wordBuilder = wordBuilder;
+    }
+
+    public void flushChar() {
+        Character ch=MorseDic.morseToLetters.get(charBuilder.toString());
+        if (ch!=null) {
+            wordBuilder.append(ch);
+            Log.d("flushChar", "Add " + ch + " to wordBuilder");
+        }
+        charBuilder=new StringBuilder();
+
+    }
 }

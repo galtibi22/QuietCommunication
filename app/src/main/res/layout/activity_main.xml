@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_blue_dark"
+    android:background="@color/backgroundPrimary"
     tools:context=".MainActivity"
     tools:layout_editor_absoluteY="81dp">
 
@@ -17,7 +17,10 @@
         android:layout_marginStart="11dp"
         android:layout_marginTop="18dp"
         android:background="@android:color/white"
-        android:text="TextView"
+        android:text="Hi :-)"
+        android:textColor="@android:color/black"
+        android:textSize="20dp"
+        android:gravity="center"
         app:layout_constraintBottom_toTopOf="@+id/editText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,14 +36,16 @@
         android:background="@android:color/white"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Enter text to translate"
-        app:layout_constraintBottom_toTopOf="@+id/push_button"
+        android:text="@string/translate"
+        android:textSize="20dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/translate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <Button
-        android:id="@+id/push_button"
+        android:id="@+id/translate"
         android:layout_width="0dp"
         android:layout_height="75dp"
         android:layout_marginBottom="29dp"
